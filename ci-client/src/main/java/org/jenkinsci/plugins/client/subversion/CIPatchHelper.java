@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
-import java.net.URL;
 
 import org.jenkinsci.plugins.client.CIApplication;
 import org.jenkinsci.plugins.client.CIConfigure;
@@ -16,7 +15,14 @@ import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
 import org.tmatesoft.svn.core.wc.SVNClientManager;
 import org.tmatesoft.svn.core.wc.SVNDiffClient;
 import org.tmatesoft.svn.core.wc.SVNRevision;
-
+/**
+ * 
+ * <p>Description: [差异文件助手]</p>
+ * Created on 2017年9月30日
+ * @author  <a href="mailto: hanshixiong@camelotchina.com">韩士雄</a>
+ * @version 1.0 
+ * Copyright (c) 2017 北京柯莱特科技有限公司 交付部
+ */
 public class CIPatchHelper {
 	/** patch文件存放路径 */
 	private final String PATCH_FILE = CIConfigure.DATA_PATH + "patch.diff";
@@ -32,6 +38,7 @@ public class CIPatchHelper {
 	 * @author[hanshixiong]
 	 */
 	public void setSVN(String svnuser, String svnpass) {
+		@SuppressWarnings("deprecation")
 		ISVNAuthenticationManager svnAuth = new BasicAuthenticationManager( svnuser , svnpass );
 		svnClientManager.setAuthenticationManager(svnAuth);
 	}
@@ -49,8 +56,9 @@ public class CIPatchHelper {
 	public static CIPatchHelper getInstance() {
 		if ( _instance==null ) {
 			SVNRepositoryFactoryImpl.setup();
-			String username = CIApplication.getCIConfig().getSVNAuth().getUsername();
-			String password = CIApplication.getCIConfig().getSVNAuth().getPassword();
+			SVNAuth a =  CIApplication.ciConfigure.getSVNAuth();
+			String username = a.getUsername();
+			String password = a.getPassword();
 			@SuppressWarnings("deprecation")
 			ISVNAuthenticationManager svnAuth = new BasicAuthenticationManager( username , password );
 			svnClientManager = SVNClientManager.newInstance(null,svnAuth);
@@ -76,7 +84,7 @@ public class CIPatchHelper {
 		if ( !dataPath.exists() ) {
 			dataPath.mkdir();
 		}
-        OutputStream os = new FileOutputStream(this.getDiffFilePath(), true);
+        OutputStream os = new FileOutputStream(this.getPatchFilePath(), true);
         diffClient.doDiff( changeFile,
         				   SVNRevision.UNDEFINED, 
         				   SVNRevision.WORKING, 
@@ -93,7 +101,7 @@ public class CIPatchHelper {
 	 * @return File
 	 * @author[hanshixiong]
 	 */
-	public File getDiffFile() {
+	public File getPatchFile() {
 		return new File(PATCH_FILE);
 	}
 	/**
@@ -103,7 +111,7 @@ public class CIPatchHelper {
 	 * @return
 	 * @author[hanshixiong]
 	 */
-	public String getDiffFilePath() {
+	public String getPatchFilePath() {
 		return PATCH_FILE;
 	}
 	/**
@@ -113,7 +121,7 @@ public class CIPatchHelper {
 	 * @author[hanshixiong]
 	 */
 	private void resetPatch() {
-		File diff = this.getDiffFile();
+		File diff = this.getPatchFile();
 		if ( diff.exists() ) {
 			diff.delete();
 		}

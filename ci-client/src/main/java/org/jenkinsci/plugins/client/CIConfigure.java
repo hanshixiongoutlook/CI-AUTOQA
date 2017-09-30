@@ -12,11 +12,11 @@ import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.dom4j.tree.BaseElement;
 import org.jenkinsci.plugins.client.subversion.SVNAuth;
+import org.jenkinsci.plugins.client.windows.MessageWindow;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.auth.BasicAuthenticationManager;
 import org.tmatesoft.svn.core.auth.ISVNAuthenticationManager;
 import org.tmatesoft.svn.core.wc.SVNClientManager;
-import org.tmatesoft.svn.core.wc.SVNInfo;
 import org.tmatesoft.svn.core.wc.SVNRevision;
 
 public class CIConfigure {
@@ -136,6 +136,49 @@ public class CIConfigure {
 	 * @author[hanshixiong]
 	 */
 	public boolean isSVNEffective() {
+		SVNAuth svnAuthInfo = new SVNAuth();
+		if ( !isSVNConfigEffective(svnAuthInfo) ) {
+			return false;
+		}
+		return isSVNAuthEffective(svnAuthInfo);
+	}
+	/**
+	 * 
+	 * <p>Discription:[检查认证信息是否正确]</p>
+	 * Created on 2017年9月30日
+	 * @param svnAuthInfo
+	 * @return
+	 * @author[hanshixiong]
+	 */
+	private boolean isSVNAuthEffective(SVNAuth svnAuthInfo) {
+		try {
+			@SuppressWarnings("deprecation")
+			ISVNAuthenticationManager svnAuth = new BasicAuthenticationManager( svnAuthInfo.getUsername() , svnAuthInfo.getPassword() );
+			SVNClientManager svnClientManager = SVNClientManager.newInstance(null,svnAuth);
+			svnClientManager.setAuthenticationManager(svnAuth);
+			System.out.println(StartArgs.getInstance().getWorkspacePath());
+			svnClientManager.getWCClient().doInfo(new File(StartArgs.getInstance().getWorkspacePath()),SVNRevision.HEAD);
+		} catch (SVNException e) {
+			e.printStackTrace();
+			// SVN认证失败，重新录入SVN账号
+			if ( e.getMessage().contains("E170001") ) {
+				return false;
+			} else { // 其他SVN异常直接提示退出
+				MessageWindow.exception("SVN校验出错");
+			}
+		}
+		return true;
+	}
+	
+	/**
+	 * 
+	 * <p>Discription:[检查配置文件中是否已存SVN认证信息]</p>
+	 * Created on 2017年9月30日
+	 * @param svnAuth
+	 * @return
+	 * @author[hanshixiong]
+	 */
+	private boolean isSVNConfigEffective(SVNAuth svnAuth) {
 		String name;
 		String password;
 		SAXReader saxReader = new SAXReader();
@@ -149,25 +192,11 @@ public class CIConfigure {
 			if ( name==null || password==null || name.trim().isEmpty() || password.trim().isEmpty() ) {
 				return false;
 			}
+			svnAuth.setPassword(password);
+			svnAuth.setUsername(name);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
-		}
-		
-		try {
-			ISVNAuthenticationManager svnAuth = new BasicAuthenticationManager( name , password );
-			SVNClientManager svnClientManager = SVNClientManager.newInstance(null,svnAuth);
-			svnClientManager.setAuthenticationManager(svnAuth);
-			System.out.println(StartArgs.getInstance().getWorkspacePath());
-			SVNInfo svnInfo = svnClientManager.getWCClient().doInfo(new File(StartArgs.getInstance().getWorkspacePath()),SVNRevision.HEAD);
-		} catch (SVNException e) {
-			e.printStackTrace();
-			// SVN认证失败，重新录入SVN账号
-			if ( e.getMessage().contains("E170001") ) {
-				return false;
-			} else { // 其他SVN异常直接提示退出
-				System.out.println("exit");
-			}
 		}
 		return true;
 	}

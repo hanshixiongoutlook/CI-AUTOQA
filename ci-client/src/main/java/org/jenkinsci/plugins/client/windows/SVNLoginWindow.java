@@ -22,7 +22,7 @@ import org.jenkinsci.plugins.client.CIApplication;
  * Copyright (c) 2017 北京柯莱特科技有限公司 交付部
  */
 public class SVNLoginWindow {
-	private static SVNLoginWindow _instance;
+	private static final String SVN_EXCEPTION = "不能完成SVN认证，即将退出持续集成！";
 	private final Display display = Display.getDefault();
 	private final Shell shell = new Shell();
 	private final Composite composite = new Composite(shell, SWT.BORDER);
@@ -30,29 +30,14 @@ public class SVNLoginWindow {
 	private final Text nameText = new Text(group, SWT.BORDER);
 	private final Text passwdText = new Text(group, SWT.PASSWORD);
 	
-	private SVNLoginWindow(){}
-	/**
-	 * 
-	 * <p>Discription:[获取SVN账号密码窗口实体]</p>
-	 * Created on 2017年9月26日
-	 * @return
-	 * @author[hanshixiong]
-	 */
-	public static SVNLoginWindow getInstance() {
-		if ( _instance==null ) {
-			_instance = new SVNLoginWindow();
-			_instance.setComposite()
-					 .setShell()
-					 .setCancelBtn()
-					 .setConfirmBtn()
-					 .setGroup()
-					 .setNameInput()
-					 .setPasswordInput();
-		}
-		return _instance;
-	}
-	private void start() {
-		
+	private SVNLoginWindow(){
+		this.setComposite()
+				 .setShell()
+				 .setCancelBtn()
+				 .setConfirmBtn()
+				 .setGroup()
+				 .setNameInput()
+				 .setPasswordInput();
 	}
 	/**
 	 * 
@@ -60,11 +45,10 @@ public class SVNLoginWindow {
 	 * Created on 2017年9月26日
 	 * @author[hanshixiong]
 	 */
-	public void show() {
-		// 如果只是暂时隐藏则重新展示
-		if ( !shell.isVisible() ) {
-			shell.setVisible(true);
-		}
+	public static void show() {
+		new SVNLoginWindow().open();;
+	}
+	public void open() {
 		shell.open();
 		shell.layout();
 		while( !shell.isDisposed() ) {
@@ -87,7 +71,8 @@ public class SVNLoginWindow {
 		shell.addShellListener(new ShellAdapter() {
 			// 点击x时退出程序，不填写svn账号无法进行后续操作
 			public void shellClosed(ShellEvent e) {
-				System.exit(-1);
+				shell.dispose();
+				MessageWindow.exception(SVN_EXCEPTION);
 			}
 		});
 		return this;
@@ -160,7 +145,7 @@ public class SVNLoginWindow {
 					return;
 				}
 				CIApplication.getCIConfig().setSVNAuth(username, password);
-				shell.setVisible(false);
+				shell.dispose();
 			}
 		});
 		return this;
@@ -180,7 +165,7 @@ public class SVNLoginWindow {
 			// 点击取消时退出程序，不填写svn账号无法进行后续操作
 			public void widgetSelected(SelectionEvent e) {
 				shell.dispose();
-				System.exit(-1);
+				MessageWindow.exception(SVN_EXCEPTION);
 			}
 		});
 		return this;

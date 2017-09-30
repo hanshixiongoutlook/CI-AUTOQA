@@ -5,24 +5,24 @@ import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-public class CIBrowser {
-	private static CIBrowser _instance = null;
+public class CIMonitorWindow {
+	private static CIMonitorWindow _instance = null;
 	private static Display display = new Display();
 	private static Shell shell = new Shell(display);
 	private static final Browser browser = new Browser(shell, SWT.FILL);
 	
-	public static CIBrowser getInstance() {
+	public static CIMonitorWindow getInstance() {
 		if ( _instance == null ) {
-			return new CIBrowser();
+			return new CIMonitorWindow();
 		}
 		return _instance;
 	}
-	
+	//http://10.95.121.180:8084/jenkins/build-monitor/?querys=CHECKSTYLE_COMMON~127
 	public void open(String url) {
 		shell.setText("构建进度");
 		shell.setSize(800, 600);
 		browser.setBounds(0, 0, 800, 580);
-		browser.setUrl("http://10.95.121.180:8084/jenkins/build-monitor/?querys=CHECKSTYLE_COMMON~127");
+		browser.setUrl(url);
 
 		shell.addShellListener(new ShellListener() {
 			

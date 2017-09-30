@@ -9,17 +9,34 @@ import org.jenkinsci.plugins.client.subversion.CIPatchHelper;
 import org.jenkinsci.plugins.client.windows.SVNLoginWindow;
 
 class CIApplication {
-	private CIPatchHelper patchHelper = CIPatchHelper.getInstance();
-	private static CIConfigure ciConfigure = CIConfigure.getInstance();
-	private static StartArgs startArgs;
+	public static CIPatchHelper patchHelper;
+	public static CIConfigure ciConfigure;
+	public static StartArgs startArgs;
 	static void main(String[] args) {
+		ciConfigure = CIConfigure.getInstance();
+		patchHelper = CIPatchHelper.getInstance();
+		/* #### 测试用数据#### */
 		args = initTestArgs();
+		
+		// 初始化持续集成参数
 		startArgs = StartArgs.getInstance(args);
-		SVNLoginWindow svnWindow = SVNLoginWindow.getInstance();
+		
+		// 检查SVN认证信息
 		while ( !ciConfigure.isSVNEffective() ) {
 			println "启动SVN认证"
-			svnWindow.show();
+			SVNLoginWindow.show();
+			println "已认证"
 		}
+		
+		// 生成patch文件
+		File[] changeFiles =  startArgs.getChangeFiles();
+		if ( changeFiles!=null ) {
+			changeFiles.each { file ->
+				patchHelper.doDiff(file);
+			}
+		}
+		
+		
 //		printArgs(args);
 		// 1. 初始化提交参数
 //		HookArguments hookManage = HookArguments.getInstance(args);
@@ -40,6 +57,7 @@ class CIApplication {
 		return ciConfigure;
 	}
 	
+	// Just for test
 	private static String[] initTestArgs() {
 		String workspace = "D:\\workspace\\ci-test";
 		String svnDepth = "3";
