@@ -1,0 +1,208 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:l="/lib/layout" xmlns:x="jelly:xml">
+	<st:contentType value="text/html;charset=UTF-8" />
+	<st:setHeader name="Expires" value="0" />
+	<st:setHeader name="Cache-Control" value="no-cache,no-store,must-revalidate" />
+	<j:set var="resourcesURL" value="${request.contextPath}/${it.urlName}/static" />
+	<j:set var="jobsURL" value="${rootURL}/job" />
+	<x:doctype name="html" />
+<html>
+<head>
+<meta http-equiv="charset" content="UTF-8"></meta>
+<title></title>
+<script type="text/javascript">
+//------------------------- Ajax Util -------------------------//
+/**
+ * httpGet请求
+ * {url:,success:,async:}
+ */
+var httpGet = function (params) {
+	var xmlhttp = createHttpRequest();
+	xmlhttp.onreadystatechange = function(){
+		if (xmlhttp.readyState==4) {
+			if (xmlhttp.status==200)
+				params.success(xmlhttp.responseText)
+			else if (params.error)
+				params.error(xmlhttp.responseText)
+	    }
+	}
+	xmlhttp.open("GET",params.url, params.async || true);
+	xmlhttp.send();
+}
+/**
+ * HttpPost请求
+ * {url:,success:,async:,data:}
+ */
+var httpPost = function (params) {
+	var xmlhttp = createHttpRequest();
+	xmlhttp.onreadystatechange = function(){
+		if (xmlhttp.readyState==4) {
+			if (xmlhttp.status==200)
+				params.success(xmlhttp.responseText)
+			else if (params.error)
+				params.error(xmlhttp.responseText)
+	    }
+	}
+	xmlhttp.open("POST",params.url, params.async || true);
+	xmlhttp.send(params.data);
+}
+/**
+ * 创建http对象
+ */
+function createHttpRequest() {
+	var xmlhttp;
+	if (window.XMLHttpRequest) {
+	    //  IE7+, Firefox, Chrome, Opera, Safari 浏览器执行代码
+	    xmlhttp=new XMLHttpRequest();
+	} else {
+	    // IE6, IE5 浏览器执行代码
+	    xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+	}
+	return xmlhttp;
+}
+</script>
+</head>
+<body>
+<!-- 进度条	
+	<div class="wrapper" id="wrapper">
+		<div class="load-bar" id="loader">0%</div>
+	</div>
+-->
+</body>
+<script type="text/javascript">
+//------------------------- 展示构建进度 -------------------------//
+var defaultBarHeight = window.innerHeight - 20;
+var queryString = '${request.parameterMap.querys[0]}';
+var queryArray = getQueryArray();// 获取请求的job数
+var jobQuantity = queryArray?queryArray.length:0;// 监控的job数量
+function getQueryArray() {
+	var queryArray  = [];
+	var jobArray = queryString.split(",");
+	var i = 0;
+	while (true) {
+		if ( i==jobArray.length ) break;
+		var jobJson = {};
+		var job = jobArray[i].split("~");
+		jobJson.jobName = job[0];
+		jobJson.buildNum = job[1];
+		queryArray[i] = jobJson;
+		i++;
+	}
+	return queryArray;
+}
+function initLoadBar() {
+	addLoadBar();
+	setLoadBarStyle();
+}
+/**
+ * 创建进度条
+ */
+function addLoadBar() {
+	var i=0;
+	while(true) {
+		if ( i==queryArray.length ) break;
+		
+		var wrapper = document.createElement('div');
+		wrapper.className = "wrapper";
+		wrapper.setAttribute("id","wrapper_"+queryArray[i].jobName);
+		
+		var loadBar = document.createElement('div');
+		loadBar.className = "load-bar";
+		loadBar.setAttribute("id","loadbar_"+queryArray[i].jobName);
+		loadBar.innerHTML = queryArray[i].jobName;
+		wrapper.appendChild(loadBar);
+	    document.body.appendChild(wrapper);
+		
+		i++;
+	}
+}
+/**
+ * 设置进度条样式
+ */
+function setLoadBarStyle() {
+	var barHeight = defaultBarHeight; // 进度条默认高度为浏览器高度
+	if ( jobQuantity>0 ) {
+		barHeight = defaultBarHeight/jobQuantity;
+	}
+	var loadBar = document.getElementsByClassName("load-bar");
+	if ( loadBar ) {
+		var i=0;
+		while(true) {
+			if ( i==loadBar.length ) break;
+			loadBar[i].style.height = barHeight + "px";
+			loadBar[i].style.lineHeight = barHeight + "px";
+			i++;
+		}
+		console.log("loadBar.length: " + loadBar.length)
+	}
+}
+window.onload = function() {
+	initLoadBar();
+	loadProgress();
+}
+/**
+ * 加载构建进度
+ */
+function loadProgress() {
+	var loader_time = setInterval(function(){
+		httpGet({
+			url:"${request.contextPath}/build-monitor/loadBuild?querys="+queryString,
+			async: false,
+			success: function(data) {
+				var stopFlag = true;
+				console.log(data)
+				var buildArray = eval('(' + data + ')');
+				if ( buildArray ) {
+					var i = 0;
+					while(true) {
+						if (i==buildArray.length) break;
+						
+						var loader = document.getElementById("loadbar_"+buildArray[i].jobName);
+						loader.style.width = buildArray[i].progress + "%";
+						var buildInfo = buildArray[i].jobName + " #" + buildArray[i].buildNum;
+						if ( buildArray[i].progress!=100 ) {
+							stopFlag = false;// 存在未构建完成的任务时，不能停止刷新数据
+							loader.innerHTML = buildInfo + " " + buildArray[i].progress + "%";
+						} else {
+							if (buildArray[i].color=="BLUE")
+								loader.innerHTML = buildInfo + " Successfully";
+							else {
+								loader.innerHTML = buildInfo + " failed";
+								loader.style.backgroundColor = "red";
+							}
+						}
+						i++;
+					}
+				}
+				if ( stopFlag ) { // 停止刷新数据
+					clearInterval(loader_time); 
+				}
+			}
+		});
+	}, 3000);
+}
+</script>
+<style>
+.wrapper {
+	width: 100%;
+	text-align: center;
+	background-color: #aaaaaa;
+	margin: 3px auto;
+	border-radius: 25px; #
+	box-shadow: 5px -5px 10px #123456
+}
+.load-bar {
+	width: 0%;
+	background-color: green;
+	border-radius: 25px;
+	transition: width 1s;
+	-webkit-transition: width 1s;
+	-moz-transition: width 1s;
+	-o-transition: width 1s;
+}
+.load-bar-action {
+	width: 100%;
+	background-color: green;
+}
+</style>
+</html>
+</j:jelly>

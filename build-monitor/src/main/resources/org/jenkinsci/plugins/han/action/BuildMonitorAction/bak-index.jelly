@@ -1,0 +1,50 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:l="/lib/layout" xmlns:x="jelly:xml">
+<st:contentType value="text/html;charset=UTF-8"/>
+<st:setHeader name="Expires" value="0" />
+<st:setHeader name="Cache-Control" value="no-cache,no-store,must-revalidate" />
+
+<j:set var="resourcesURL" value="${request.contextPath}/${it.urlName}/static" />
+<j:set var="jobsURL" value="${rootURL}/job" />
+<j:set var="angularVersion" value="1.5.8" />
+<x:doctype name="html" />
+<html>
+<head>
+	<title>${it.displayName}</title>
+	<link rel="stylesheet" href="${resourcesURL}/bootstrap/css/bootstrap.min.css"/>
+	<style type="text/css">
+	.dashboard {
+    		background: url(${resourcesURL}/images/background.png);
+	}
+	</style>
+	<script>
+		window.onload = function() {
+			var height = window.screen.availHeight;
+			var pro = document.getElementsByClassName("progress");
+			for ( var i in pro ) {
+				pro[i].setAttribute("style","height:"+getProgressHeight(height,2)+"px")
+			}
+		}
+		function getProgressHeight(screenHeight, n) {
+			return (screenHeight - 200)/n;
+		}
+	</script>
+</head>
+<body class="dashboard">
+<div class="container" >
+    <h3>构建进度</h3>
+    <div class="row" >
+        <div class="progress col-lg-12" style="background-color: #dedef8;box-shadow: inset 1px -1px 1px #444, inset -1px 1px 1px #444;">
+            <div style="width:100%; heght:100; background-color: red; margin:15px 0 15px 0; border-radius:5px;">
+            		<a style="color:white">Job_Name</a>
+            </div>
+        </div>
+    </div>
+    <div class="row" style="padding-top:5px;">
+        <div class="progress col-lg-12" style="background-color: #dedef8;box-shadow: inset 1px -1px 1px #444, inset -1px 1px 1px #444;">
+            <p></p>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+</j:jelly>
