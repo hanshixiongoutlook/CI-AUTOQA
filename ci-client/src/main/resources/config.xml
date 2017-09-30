@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ci-configure>
+	<svn-auth>
+		<username></username>
+		<password></password>
+	</svn-auth>
+	<jobs>
+		<job></job>
+	</jobs>
+</ci-configure>
