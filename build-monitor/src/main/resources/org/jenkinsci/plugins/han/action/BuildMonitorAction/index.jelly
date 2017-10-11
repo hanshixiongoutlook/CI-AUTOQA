@@ -148,7 +148,7 @@ function loadProgress() {
 			url:"${request.contextPath}/build-monitor/loadBuild?querys="+queryString,
 			async: false,
 			success: function(data) {
-				var stopFlag = true;
+				var stopFlag = false;
 				console.log(data)
 				var buildArray = eval('(' + data + ')');
 				if ( buildArray ) {
@@ -173,9 +173,9 @@ function loadProgress() {
 						i++;
 					}
 				}
-				if ( stopFlag ) { // 停止刷新数据
-					clearInterval(loader_time); 
-				}
+				//if ( stopFlag ) { // 停止刷新数据
+					//clearInterval(loader_time); 
+				//}
 			}
 		});
 	}, 3000);
