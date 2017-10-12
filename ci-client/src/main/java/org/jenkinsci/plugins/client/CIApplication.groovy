@@ -5,21 +5,29 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
 
+import org.jenkinsci.plugins.client.build.JenkinsHelper
 import org.jenkinsci.plugins.client.subversion.CIPatchHelper;
 import org.jenkinsci.plugins.client.windows.SVNLoginWindow;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 class CIApplication {
 	public static CIPatchHelper patchHelper;
 	public static CIConfigure ciConfigure;
-	public static StartArgs startArgs;
+	public static MainArguments mainArguments;
+	public static JenkinsHelper jenkinsHelper;
+	private static Logger LOG = LoggerFactory.getLogger(CIApplication.class);
 	static void main(String[] args) {
+		LOG.error "aaaaaaaaa"
+		LOG.info "aaaaaaaaa"
 		ciConfigure = CIConfigure.getInstance();
 		patchHelper = CIPatchHelper.getInstance();
+		jenkinsHelper = JenkinsHelper.getInstance();
 		/* #### 测试用数据#### */
 		args = initTestArgs();
 		
 		// 初始化持续集成参数
-		startArgs = StartArgs.getInstance(args);
+		mainArguments = MainArguments.getInstance(args);
 		
 		// 检查SVN认证信息
 		while ( !ciConfigure.isSVNEffective() ) {
@@ -29,14 +37,16 @@ class CIApplication {
 		}
 		
 		// 生成patch文件
-		File[] changeFiles =  startArgs.getChangeFiles();
+		File[] changeFiles =  mainArguments.getChangeFiles();
 		if ( changeFiles!=null ) {
 			changeFiles.each { file ->
 				patchHelper.doDiff(file);
 			}
 		}
+		// 启动远程构建
+		jenkinsHelper.buildAll();
 		
-		
+		while(true);
 //		printArgs(args);
 		// 1. 初始化提交参数
 //		HookArguments hookManage = HookArguments.getInstance(args);
@@ -63,7 +73,7 @@ class CIApplication {
 		String svnDepth = "3";
 		String submitFileTmpPath = "D:\\workspace\\online_meal\\ci-client\\src\\test\\resources\\submitFileTmpPath";
 		String commentTmpPath = "D:\\workspace\\online_meal\\ci-client\\src\\test\\resources\\commentTmpPath";
-		String[] args = [submitFileTmpPath, svnDepth, commentTmpPath, workspace ];
+		String[] args = ["['TestDemo','Test2']", submitFileTmpPath, svnDepth, commentTmpPath, workspace ];
 		println "Arg : " + args;
 		return args;
 	}

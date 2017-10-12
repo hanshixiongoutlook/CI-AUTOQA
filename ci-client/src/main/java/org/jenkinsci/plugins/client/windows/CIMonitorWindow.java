@@ -1,10 +1,12 @@
 package org.jenkinsci.plugins.client.windows;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
+import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
-import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.jenkinsci.plugins.client.CIApplication;
+import org.jenkinsci.plugins.client.windows.MessageWindow.TitleEnum;
 public class CIMonitorWindow {
 	private static CIMonitorWindow _instance = null;
 	private static Display display = new Display();
@@ -23,21 +25,12 @@ public class CIMonitorWindow {
 		shell.setSize(800, 600);
 		browser.setBounds(0, 0, 800, 580);
 		browser.setUrl(url);
-
-		shell.addShellListener(new ShellListener() {
-			
-			public void shellIconified(ShellEvent e) {}
-			
-			public void shellDeiconified(ShellEvent e) {}
-			
-			public void shellDeactivated(ShellEvent e) {}
-			
+		shell.addShellListener(new ShellAdapter() {
 			public void shellClosed(ShellEvent e) {
-				System.out.println("click exit");
-			}
-			
-			public void shellActivated(ShellEvent e) {
-				System.out.println("click active");
+				System.out.println("[Info] stop all");
+				CIApplication.jenkinsHelper.stopAll(); // 取消所有构建
+				System.exit(-1);
+//				MessageWindow.confirm(MessageWindow.TitleEnum.TIP, "确认取消构建？", MessageWindow.ExitEnum.FAILURE);
 			}
 		});
 		shell.open();

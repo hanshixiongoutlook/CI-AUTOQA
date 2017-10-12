@@ -13,6 +13,8 @@ import org.dom4j.io.SAXReader;
 import org.dom4j.tree.BaseElement;
 import org.jenkinsci.plugins.client.subversion.SVNAuth;
 import org.jenkinsci.plugins.client.windows.MessageWindow;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.auth.BasicAuthenticationManager;
 import org.tmatesoft.svn.core.auth.ISVNAuthenticationManager;
@@ -20,6 +22,7 @@ import org.tmatesoft.svn.core.wc.SVNClientManager;
 import org.tmatesoft.svn.core.wc.SVNRevision;
 
 public class CIConfigure {
+	private static Logger LOG = LoggerFactory.getLogger(CIConfigure.class);
 	private static CIConfigure _instance;
 	/** 临时数据存储路径 */
 	public static final String DATA_PATH = System.getenv("HOME")+File.separator + "AppData/Local/ci-data" + File.separator;
@@ -85,6 +88,8 @@ public class CIConfigure {
 	 * @author[hanshixiong]
 	 */
 	public void setSVNAuth(String username, String password) {
+		// 更新SVN认证信息
+		CIApplication.patchHelper.setSVN(username, password);
 		SAXReader saxReader = new SAXReader();
 		try {
 			Document doc = saxReader.read(CONFIG_PATH);
@@ -136,6 +141,7 @@ public class CIConfigure {
 	 * @author[hanshixiong]
 	 */
 	public boolean isSVNEffective() {
+		LOG.info("check svn auth... ...");
 		SVNAuth svnAuthInfo = new SVNAuth();
 		if ( !isSVNConfigEffective(svnAuthInfo) ) {
 			return false;
@@ -156,15 +162,15 @@ public class CIConfigure {
 			ISVNAuthenticationManager svnAuth = new BasicAuthenticationManager( svnAuthInfo.getUsername() , svnAuthInfo.getPassword() );
 			SVNClientManager svnClientManager = SVNClientManager.newInstance(null,svnAuth);
 			svnClientManager.setAuthenticationManager(svnAuth);
-			System.out.println(StartArgs.getInstance().getWorkspacePath());
-			svnClientManager.getWCClient().doInfo(new File(StartArgs.getInstance().getWorkspacePath()),SVNRevision.HEAD);
+			System.out.println(CIApplication.mainArguments.getWorkspacePath());
+			svnClientManager.getWCClient().doInfo(new File(CIApplication.mainArguments.getWorkspacePath()),SVNRevision.HEAD);
 		} catch (SVNException e) {
 			e.printStackTrace();
 			// SVN认证失败，重新录入SVN账号
 			if ( e.getMessage().contains("E170001") ) {
 				return false;
 			} else { // 其他SVN异常直接提示退出
-				MessageWindow.exception("SVN校验出错");
+				MessageWindow.info(MessageWindow.TitleEnum.ERROR, "SVN认证失败", MessageWindow.ExitEnum.FAILURE);
 			}
 		}
 		return true;

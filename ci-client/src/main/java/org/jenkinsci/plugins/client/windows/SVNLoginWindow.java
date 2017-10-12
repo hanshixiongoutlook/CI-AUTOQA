@@ -72,7 +72,7 @@ public class SVNLoginWindow {
 			// 点击x时退出程序，不填写svn账号无法进行后续操作
 			public void shellClosed(ShellEvent e) {
 				shell.dispose();
-				MessageWindow.exception(SVN_EXCEPTION);
+				MessageWindow.info(MessageWindow.TitleEnum.ERROR, SVN_EXCEPTION, MessageWindow.ExitEnum.FAILURE);
 			}
 		});
 		return this;
@@ -165,7 +165,7 @@ public class SVNLoginWindow {
 			// 点击取消时退出程序，不填写svn账号无法进行后续操作
 			public void widgetSelected(SelectionEvent e) {
 				shell.dispose();
-				MessageWindow.exception(SVN_EXCEPTION);
+				MessageWindow.info(MessageWindow.TitleEnum.ERROR, SVN_EXCEPTION, MessageWindow.ExitEnum.FAILURE);
 			}
 		});
 		return this;
