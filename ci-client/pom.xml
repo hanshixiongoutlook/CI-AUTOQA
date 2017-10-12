@@ -32,76 +32,90 @@
 			<artifactId>fastjson</artifactId>
 			<version>1.2.31</version>
 		</dependency>
-<!-- https://mvnrepository.com/artifact/org.eclipse/swt-win32-win32-x86 
-<dependency>
-    <groupId>org.eclipse</groupId>
-    <artifactId>swt-win32-win32-x86</artifactId>
-    <version>3.3.0</version>
-</dependency>
--->
-<!-- https://mvnrepository.com/artifact/org.eclipse.swt.gtk.linux/x86 
-<dependency>
-    <groupId>org.eclipse.swt.gtk.linux</groupId>
-    <artifactId>x86</artifactId>
-    <version>3.3.0-v3346</version>
-    <scope>provided</scope>
-</dependency>
--->
-<!-- https://mvnrepository.com/artifact/org.tmatesoft.svnkit/svnkit -->
-<dependency>
-    <groupId>org.tmatesoft.svnkit</groupId>
-    <artifactId>svnkit</artifactId>
-    <version>1.7.14</version>
-</dependency>
-<dependency>
-    <groupId>org.tmatesoft.sqljet</groupId>
-    <artifactId>sqljet</artifactId>
-    <version>1.1.10</version>
-</dependency>
-<!-- https://mvnrepository.com/artifact/org.antlr/antlr-runtime -->
-<dependency>
-    <groupId>org.antlr</groupId>
-    <artifactId>antlr-runtime</artifactId>
-    <version>3.4</version>
-</dependency>
-<!-- https://mvnrepository.com/artifact/org.tmatesoft.svnkit/sequence-library -->
-<dependency>
-    <groupId>org.tmatesoft.svnkit</groupId>
-    <artifactId>sequence-library</artifactId>
-    <version>1.0.0</version>
-</dependency>
-<!-- https://mvnrepository.com/artifact/dom4j/dom4j -->
-<dependency>
-    <groupId>dom4j</groupId>
-    <artifactId>dom4j</artifactId>
-    <version>1.6.1</version>
-</dependency>
-<!-- https://mvnrepository.com/artifact/org.codehaus.groovy/groovy-all -->
-<dependency>
-    <groupId>org.codehaus.groovy</groupId>
-    <artifactId>groovy-all</artifactId>
-    <version>2.4.7</version>
-</dependency>
-
+		<dependency>
+			<groupId>org.tmatesoft.svnkit</groupId>
+			<artifactId>svnkit</artifactId>
+			<version>1.7.14</version>
+		</dependency>
+		<dependency>
+			<groupId>org.tmatesoft.sqljet</groupId>
+			<artifactId>sqljet</artifactId>
+			<version>1.1.10</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.antlr/antlr-runtime -->
+		<dependency>
+			<groupId>org.antlr</groupId>
+			<artifactId>antlr-runtime</artifactId>
+			<version>3.4</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.tmatesoft.svnkit/sequence-library -->
+		<dependency>
+			<groupId>org.tmatesoft.svnkit</groupId>
+			<artifactId>sequence-library</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/dom4j/dom4j -->
+		<dependency>
+			<groupId>dom4j</groupId>
+			<artifactId>dom4j</artifactId>
+			<version>1.6.1</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.codehaus.groovy/groovy-all -->
+		<dependency>
+			<groupId>org.codehaus.groovy</groupId>
+			<artifactId>groovy-all</artifactId>
+			<version>2.4.7</version>
+		</dependency>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.17</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.7.2</version>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-core</artifactId>
+			<version>1.0.13</version>
+		</dependency>
+		<!-- Jenkins-client -->
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>21.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.5.2</version>
+		</dependency>
+		<dependency>
+			<groupId>com.offbytwo.jenkins</groupId>
+		    <artifactId>jenkins-client</artifactId>
+		    <version>0.3.7</version>
+		</dependency>
 	</dependencies>
-	
-	<build>  
-        <finalName>image</finalName>  
-        <plugins>  
-            <plugin>  
-                <groupId>org.apache.maven.plugins</groupId>  
-                <artifactId>maven-jar-plugin</artifactId>  
-                <version>2.4</version>  
-                <configuration>  
-                    <archive>  
-                        <manifest>  
-                            <addClasspath>true</addClasspath>  
-                            <classpathPrefix>lib/</classpathPrefix>  
-                            <mainClass>org.jenkinsci.plugins.client.CIApplication</mainClass>  
-                        </manifest>  
-                    </archive>  
-                </configuration>  
-            </plugin>  
-        </plugins>  
-    </build>  
+
+	<build>
+		<finalName>image</finalName>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.4</version>
+				<configuration>
+					<archive>
+						<manifest>
+							<addClasspath>true</addClasspath>
+							<classpathPrefix>lib/</classpathPrefix>
+							<mainClass>org.jenkinsci.plugins.client.CIApplication</mainClass>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>
