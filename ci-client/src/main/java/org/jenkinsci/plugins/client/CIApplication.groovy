@@ -71,7 +71,7 @@ class CIApplication {
 	private static String[] initTestArgs() {
 		String workspace = "D:\\workspace\\ci-test";
 		String svnDepth = "3";
-		String submitFileTmpPath = "D:\\workspace\\online_meal\\ci-client\\src\\test\\resources\\submitFileTmpPath";
+		String submitFileTmpPath = "D:\\workspace\\graduate-project\\CI-AUTOQA\\ci-client\\src\\test\\resources\\submitFileTmpPath";
 		String commentTmpPath = "D:\\workspace\\online_meal\\ci-client\\src\\test\\resources\\commentTmpPath";
 		String[] args = ["['TestDemo','Test2']", submitFileTmpPath, svnDepth, commentTmpPath, workspace ];
 		println "Arg : " + args;

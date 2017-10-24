@@ -6,7 +6,6 @@ import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.jenkinsci.plugins.client.CIApplication;
-import org.jenkinsci.plugins.client.windows.MessageWindow.TitleEnum;
 public class CIMonitorWindow {
 	private static CIMonitorWindow _instance = null;
 	private static Display display = new Display();

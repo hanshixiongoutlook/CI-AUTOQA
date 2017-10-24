@@ -1,8 +1,8 @@
 package org.jenkinsci.plugins.client.subversion;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 
 import org.jenkinsci.plugins.client.CIApplication;
@@ -74,11 +74,11 @@ public class CIPatchHelper {
 	 * <p>Discription:[生成patch.diff文件]</p>
 	 * Created on 2017年9月21日
 	 * @param changeFile commit的变更文件
-	 * @throws FileNotFoundException
 	 * @throws SVNException
+	 * @throws IOException 
 	 * @author[hanshixiong]
 	 */
-	public void doDiff(File changeFile) throws FileNotFoundException, SVNException {
+	public void doDiff(File changeFile) throws SVNException, IOException {
 		SVNDiffClient diffClient = svnClientManager.getDiffClient();
 		File dataPath = new File(CIConfigure.DATA_PATH);
 		if ( !dataPath.exists() ) {
@@ -90,10 +90,12 @@ public class CIPatchHelper {
         				   SVNRevision.WORKING, 
         				   SVNRevision.HEAD,
         				   SVNDepth.INFINITY, 
-        				   true, 
+        				   false, 
         				   os, 
         				   null);
+        os.close();
 	}
+
 	/**
 	 * 
 	 * <p>Discription:[获取patch.diff文件]</p>
