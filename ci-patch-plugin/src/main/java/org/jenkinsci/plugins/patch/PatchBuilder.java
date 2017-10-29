@@ -1,0 +1,159 @@
+package org.jenkinsci.plugins.patch;
+import hudson.Launcher;
+import hudson.Extension;
+import hudson.util.FormValidation;
+import hudson.model.AbstractBuild;
+import hudson.model.BuildListener;
+import hudson.model.AbstractProject;
+import hudson.tasks.Builder;
+import hudson.tasks.BuildStepDescriptor;
+import net.sf.json.JSONObject;
+
+import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.QueryParameter;
+
+import javax.servlet.ServletException;
+
+import java.io.IOException;
+
+/**
+ * Sample {@link Builder}.
+ *
+ * <p>
+ * When the user configures the project and enables this builder,
+ * {@link DescriptorImpl#newInstance(StaplerRequest)} is invoked
+ * and a new {@link PatchBuilder} is created. The created
+ * instance is persisted to the project configuration XML by using
+ * XStream, so this allows you to use instance fields (like {@link #name})
+ * to remember the configuration.
+ *
+ * <p>
+ * When a build is performed, the {@link #perform(AbstractBuild, Launcher, BuildListener)}
+ * method will be invoked. 
+ *
+ * @author Kohsuke Kawaguchi
+ */
+public class PatchBuilder extends Builder {
+
+    private final String name;
+
+    // Fields in config.jelly must match the parameter names in the "DataBoundConstructor"
+    @DataBoundConstructor
+    public PatchBuilder(String name) {
+        this.name = name;
+    }
+
+    /**
+     * We'll use this from the <tt>config.jelly</tt>.
+     */
+    public String getName() {
+        return name;
+    }
+
+    @SuppressWarnings({ "rawtypes", "deprecation" })
+	@Override
+    public boolean perform(AbstractBuild build, Launcher launcher, BuildListener listener) {
+    	listener.getLogger().println("[patch] start apply patch file.");
+    	try {
+			ApplyPatch.getInstance(listener).applyPatch(build.getWorkspace().toString(), this.getFilterString(), listener);
+		} catch (Exception e) {
+			listener.getLogger().println("[patch] apply patch failed!");
+			listener.getLogger().println(e);
+			return false;
+		}
+    	listener.getLogger().println("[patch] successfully applyed patch file.");
+        return true;
+    }
+    /**
+     * 
+     * <p>Discription:[获取过滤条件，默认为src]</p>
+     * Created on 2017年10月29日
+     * @return
+     * @author[hanshixiong]
+     */
+    private String getFilterString() {
+    	if ( this.name==null || this.name.trim().isEmpty() ) {
+    		return "src";
+    	}
+    	return this.name.trim();
+    }
+
+    // Overridden for better type safety.
+    // If your plugin doesn't really define any property on Descriptor,
+    // you don't have to do this.
+    @Override
+    public DescriptorImpl getDescriptor() {
+        return (DescriptorImpl)super.getDescriptor();
+    }
+
+    /**
+     * Descriptor for {@link PatchBuilder}. Used as a singleton.
+     * The class is marked as public so that it can be accessed from views.
+     *
+     * <p>
+     * See <tt>src/main/resources/hudson/plugins/hello_world/HelloWorldBuilder/*.jelly</tt>
+     * for the actual HTML fragment for the configuration screen.
+     */
+    @Extension // This indicates to Jenkins that this is an implementation of an extension point.
+    public static final class DescriptorImpl extends BuildStepDescriptor<Builder> {
+        /**
+         * To persist global configuration information,
+         * simply store it in a field and call save().
+         *
+         * <p>
+         * If you don't want fields to be persisted, use <tt>transient</tt>.
+         */
+        private boolean useFrench;
+
+        /**
+         * Performs on-the-fly validation of the form field 'name'.
+         *
+         * @param value
+         *      This parameter receives the value that the user has typed.
+         * @return
+         *      Indicates the outcome of the validation. This is sent to the browser.
+         */
+        public FormValidation doCheckName(@QueryParameter String value) throws IOException, ServletException {
+            if (value.trim().length() == 0)
+                return FormValidation.error("不填写时，使用默认值 src");
+//            if (value.length() < 4)
+//                return FormValidation.warning("Isn't the name too short?");
+            return FormValidation.ok();
+        }
+
+        public boolean isApplicable(Class<? extends AbstractProject> aClass) {
+            // Indicates that this builder can be used with all kinds of project types 
+            return true;
+        }
+
+        /**
+         * This human readable name is used in the configuration screen.
+         */
+        public String getDisplayName() {
+            return "Patch plugin";
+        }
+
+        @Override
+        public boolean configure(StaplerRequest req, JSONObject formData) throws FormException {
+            // To persist global configuration information,
+            // set that to properties and call save().
+            useFrench = formData.getBoolean("useFrench");
+            // ^Can also use req.bindJSON(this, formData);
+            //  (easier when there are many fields; need set* methods for this, like setUseFrench)
+            save();
+            return super.configure(req,formData);
+        }
+
+        /**
+         * This method returns true if the global configuration says we should speak French.
+         *
+         * The method name is bit awkward because global.jelly calls this method to determine
+         * the initial state of the checkbox by the naming convention.
+         */
+        public boolean getUseFrench() {
+            return useFrench;
+        }
+    }
+}
+
