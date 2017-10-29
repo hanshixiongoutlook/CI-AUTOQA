@@ -53,7 +53,7 @@ public class ApplyPatch {
 	 */
 	public void applyPatch(String workspace, String filter, BuildListener listener) throws Exception {
 		int prefixNum = getPrefixNumber(workspace, filter, listener);
-		String cmdStr = "patch -lp" + prefixNum + " --binary < patch.diff";
+		String cmdStr = "sudo patch -lp" + prefixNum + " --binary < patch.diff";
 		this.execute(cmdStr, listener);
 	}
 	/**
@@ -71,8 +71,7 @@ public class ApplyPatch {
 	 */
 	@SuppressWarnings("resource")
 	private int getPrefixNumber(String workspace, String filter, BuildListener listener) throws IOException {
-		listener.getLogger().println("[patch] job workspace :" + workspace);
-		listener.getLogger().println("[patch] filter :" + filter);
+		listener.getLogger().println("[patch] job workspace :" + workspace + " filter is : " + filter);
 		String INDEX_FILTER = "Index:";
 		String PATH_FILTER = "/";
 		String NUM_STRING = StringUtils.isEmpty(filter)?"src":filter;
@@ -90,8 +89,6 @@ public class ApplyPatch {
 		listener.getLogger().println("[patch] patch.diff first line is :" + indexWorkPath);
 		// D:/demo-project/src/main/java/com/demo/demo.java
 		indexWorkPath = indexWorkPath.split(INDEX_FILTER)[1];
-		//xxx 转换成Linux格式
-//		indexWorkPath = new File(indexWorkPath).getPath();
 		listener.getLogger().println("[patch] user svn workspace is :" + indexWorkPath);
 		String[] paths = indexWorkPath.split(PATH_FILTER);
 		for (int i = 0; i < paths.length; i++) {
