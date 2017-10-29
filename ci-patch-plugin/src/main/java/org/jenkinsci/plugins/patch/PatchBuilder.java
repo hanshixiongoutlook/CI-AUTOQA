@@ -56,7 +56,7 @@ public class PatchBuilder extends Builder {
     public boolean perform(AbstractBuild build, Launcher launcher, BuildListener listener) {
     	listener.getLogger().println("[patch] start apply patch file.");
     	try {
-			ApplyPatch.getInstance(listener).applyPatch(build.getWorkspace().toString(), this.getFilterString(), listener);
+			ApplyPatch.getInstance().applyPatch(build.getWorkspace().toString(), this.getFilterString(), listener);
 		} catch (Exception e) {
 			listener.getLogger().println("[patch] apply patch failed!");
 			listener.getLogger().println(e);

@@ -19,23 +19,11 @@ import org.apache.commons.lang.StringUtils;
  * Copyright (c) 2017 北京柯莱特科技有限公司 交付部
  */
 public class ApplyPatch {
-	
 	private static ApplyPatch _instance;
-	private BuildListener listener;
-	/** patch -lp ${num} 脚标位字符串 */
-	private ApplyPatch(BuildListener listener) {
-		this.listener = listener;
-	}
 	private ApplyPatch() {}
 	public static ApplyPatch getInstance() {
 		if ( _instance==null ) {
 			_instance = new ApplyPatch();
-		}
-		return _instance;
-	}
-	public static ApplyPatch getInstance(BuildListener listener) {
-		if ( _instance==null ) {
-			_instance = new ApplyPatch(listener);
 		}
 		return _instance;
 	}
