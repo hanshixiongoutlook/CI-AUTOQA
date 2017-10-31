@@ -1,6 +1,7 @@
 package org.jenkinsci.plugins.patch;
 import hudson.Launcher;
 import hudson.Extension;
+import hudson.Launcher.ProcStarter;
 import hudson.util.FormValidation;
 import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
@@ -54,12 +55,13 @@ public class PatchBuilder extends Builder {
     @SuppressWarnings({ "rawtypes", "deprecation" })
 	@Override
     public boolean perform(AbstractBuild build, Launcher launcher, BuildListener listener) {
+    	
     	listener.getLogger().println("[patch] start apply patch file.");
     	try {
-			ApplyPatch.getInstance().applyPatch(build.getWorkspace().toString(), this.getFilterString(), listener);
+    		ApplyPatch.getInstance().applyPatch(build, launcher, this.getPosition(), listener);
 		} catch (Exception e) {
 			listener.getLogger().println("[patch] apply patch failed!");
-			listener.getLogger().println(e);
+			e.printStackTrace(listener.getLogger());
 			return false;
 		}
     	listener.getLogger().println("[patch] successfully applyed patch file.");
@@ -72,11 +74,8 @@ public class PatchBuilder extends Builder {
      * @return
      * @author[hanshixiong]
      */
-    private String getFilterString() {
-    	if ( this.name==null || this.name.trim().isEmpty() ) {
-    		return "src";
-    	}
-    	return this.name.trim();
+    private int getPosition() {
+    	return Integer.valueOf(this.name);
     }
 
     // Overridden for better type safety.
@@ -116,7 +115,12 @@ public class PatchBuilder extends Builder {
          */
         public FormValidation doCheckName(@QueryParameter String value) throws IOException, ServletException {
             if (value.trim().length() == 0)
-                return FormValidation.error("不填写时，使用默认值 src");
+                return FormValidation.error("不填写时，使用默认值为0");
+            try {
+				Integer.valueOf(value);
+			} catch (NumberFormatException e) {
+				return FormValidation.error("请填写int型值");
+			}
 //            if (value.length() < 4)
 //                return FormValidation.warning("Isn't the name too short?");
             return FormValidation.ok();
