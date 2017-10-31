@@ -26,11 +26,14 @@
 			<artifactId>commons-httpclient</artifactId>
 			<version>3.1</version>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/com.alibaba/fastjson -->
+		<!-- https://mvnrepository.com/artifact/com.alibaba/fastjson <dependency> 
+			<groupId>com.alibaba</groupId> <artifactId>fastjson</artifactId> <version>1.2.31</version> 
+			</dependency> -->
+		<!-- https://mvnrepository.com/artifact/net.sf.json-lib/json-lib -->
 		<dependency>
-			<groupId>com.alibaba</groupId>
-			<artifactId>fastjson</artifactId>
-			<version>1.2.31</version>
+			<groupId>net.sf.json-lib</groupId>
+			<artifactId>json-lib</artifactId>
+			<version>2.4</version>
 		</dependency>
 		<dependency>
 			<groupId>org.tmatesoft.svnkit</groupId>
@@ -38,11 +41,15 @@
 			<version>1.7.14</version>
 		</dependency>
 		<dependency>
+			<groupId>de.regnis.q.sequence</groupId>
+			<artifactId>sequence-library</artifactId>
+			<version>1.0.3</version>
+		</dependency>
+		<dependency>
 			<groupId>org.tmatesoft.sqljet</groupId>
 			<artifactId>sqljet</artifactId>
 			<version>1.1.10</version>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.antlr/antlr-runtime -->
 		<dependency>
 			<groupId>org.antlr</groupId>
 			<artifactId>antlr-runtime</artifactId>
@@ -61,11 +68,8 @@
 			<version>1.6.1</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.codehaus.groovy/groovy-all -->
-		<dependency>
-			<groupId>org.codehaus.groovy</groupId>
-			<artifactId>groovy-all</artifactId>
-			<version>2.4.7</version>
-		</dependency>
+		<!--<dependency> <groupId>org.codehaus.groovy</groupId> <artifactId>groovy-all</artifactId> 
+			<version>2.4.7</version> </dependency> -->
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
@@ -94,13 +98,18 @@
 		</dependency>
 		<dependency>
 			<groupId>com.offbytwo.jenkins</groupId>
-		    <artifactId>jenkins-client</artifactId>
-		    <version>0.3.7</version>
+			<artifactId>jenkins-client</artifactId>
+			<version>0.3.7</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse</groupId>
+			<artifactId>swt-win64</artifactId>
+			<version>4.757</version>
 		</dependency>
 	</dependencies>
 
 	<build>
-		<finalName>image</finalName>
+		<finalName>ci-client</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -114,6 +123,33 @@
 							<mainClass>org.jenkinsci.plugins.client.CIApplication</mainClass>
 						</manifest>
 					</archive>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>2.10</version>
+				<executions>
+					<execution>
+						<id>copy-dependencies</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}/lib</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.1</version>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
 				</configuration>
 			</plugin>
 		</plugins>
