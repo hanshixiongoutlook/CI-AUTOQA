@@ -4,6 +4,9 @@
 		<username></username>
 		<password></password>
 	</svn-auth>
+	<jenkins>
+		<root-url></root-url>
+	</jenkins>
 	<jobs>
 		<job></job>
 	</jobs>

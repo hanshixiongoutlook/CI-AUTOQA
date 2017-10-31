@@ -11,10 +11,9 @@ import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.dom4j.tree.BaseElement;
+import org.jenkinsci.plugins.client.build.JenkinsConfig;
 import org.jenkinsci.plugins.client.subversion.SVNAuth;
 import org.jenkinsci.plugins.client.windows.MessageWindow;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.auth.BasicAuthenticationManager;
 import org.tmatesoft.svn.core.auth.ISVNAuthenticationManager;
@@ -22,13 +21,12 @@ import org.tmatesoft.svn.core.wc.SVNClientManager;
 import org.tmatesoft.svn.core.wc.SVNRevision;
 
 public class CIConfigure {
-	private static Logger LOG = LoggerFactory.getLogger(CIConfigure.class);
 	private static CIConfigure _instance;
 	/** 临时数据存储路径 */
 	public static final String DATA_PATH = System.getenv("HOME")+File.separator + "AppData/Local/ci-data" + File.separator;
 	
 	/** Jenkins 地址：http://10.95.121.180:8084/jenkins/ */
-	public static final String JENKINS_URL = "http://10.95.121.180:8084/jenkins/";
+	private static final String JENKINS_URL = "http://10.95.121.180:8084/jenkins/";
 	/** 配置文件路径 */
 	public static final String CONFIG_PATH = DATA_PATH + "config.xml";
 	
@@ -60,10 +58,21 @@ public class CIConfigure {
 		try {
 			Document doc = DocumentHelper.createDocument();
 			Element rootEle = new BaseElement("ci-config");
+			
+			// svn auth
 			Element svnEle = new BaseElement("svn-auth");
-			rootEle.add(svnEle);
 			svnEle.add(new BaseElement("username"));
 			svnEle.add(new BaseElement("password"));
+			
+			// jenkins
+			Element jenkinsEle = new BaseElement("jenkins");
+			Element rootUrlEle = new BaseElement("root-url");
+			rootUrlEle.setText(JENKINS_URL);
+			svnEle.add(rootUrlEle);
+			
+			rootEle.add(svnEle);
+			rootEle.add(jenkinsEle);
+			
 			doc.add(rootEle);
 			writer = new PrintWriter(CONFIG_PATH);
 			doc.write(writer);
@@ -133,6 +142,34 @@ public class CIConfigure {
 		}
 		return null;
 	}
+	
+	/**
+	 * 
+	 * <p>Discription:[获取Jenkins配置信息]</p>
+	 * Created on 2017年10月29日
+	 * @return
+	 * @author[hanshixiong]
+	 */
+	public JenkinsConfig getJenkins() {
+		
+		JenkinsConfig config = new JenkinsConfig();
+		
+		SAXReader saxReader = new SAXReader();
+		Document doc;
+		try {
+			doc = saxReader.read(CONFIG_PATH);
+			Element rootEle = doc.getRootElement();
+			Element rootUrlEle = rootEle.element("jenkins").element("root-url");
+			String rootUrl = rootUrlEle.getText();
+			config.setRootUrl(rootUrl);
+			return config;
+		} catch (DocumentException e) {
+			e.printStackTrace();
+		}
+		
+		return null;
+		
+	}
 	/**
 	 * 
 	 * <p>Discription:[检查SVN配置信息]</p>
@@ -141,7 +178,6 @@ public class CIConfigure {
 	 * @author[hanshixiong]
 	 */
 	public boolean isSVNEffective() {
-		LOG.info("check svn auth... ...");
 		SVNAuth svnAuthInfo = new SVNAuth();
 		if ( !isSVNConfigEffective(svnAuthInfo) ) {
 			return false;

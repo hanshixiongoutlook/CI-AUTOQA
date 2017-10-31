@@ -14,6 +14,7 @@ import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.jenkinsci.plugins.client.CIApplication;
+import org.jenkinsci.plugins.client.CIConfigure;
 import org.jenkinsci.plugins.client.windows.CIMonitorWindow;
 import org.jenkinsci.plugins.client.windows.MessageWindow;
 
@@ -22,7 +23,6 @@ import com.offbytwo.jenkins.model.Build;
 import com.offbytwo.jenkins.model.BuildResult;
 import com.offbytwo.jenkins.model.BuildWithDetails;
 import com.offbytwo.jenkins.model.JobWithDetails;
-import com.offbytwo.jenkins.model.QueueItem;
 /**
  * 
  * <p>Description: []</p>
@@ -34,7 +34,7 @@ import com.offbytwo.jenkins.model.QueueItem;
 public class JenkinsHelper {
 	private static JenkinsHelper _instance;
 	/** Jenkins服务地址 */
-	private static final String JENKINS_URL = "http://10.95.121.181:8081/jenkins/";
+	private static final String JENKINS_URL = CIConfigure.getInstance().getJenkins().getRootUrl();
 	/** 任务监控地址 */
 	private static final String MONITOR_URL = JENKINS_URL + "build-monitor/?querys=";
 	private static JenkinsServer jenkins;

@@ -84,13 +84,14 @@ public class CIPatchHelper {
 		if ( !dataPath.exists() ) {
 			dataPath.mkdir();
 		}
+		CIApplication.printArgs(new String[]{"#"+changeFile.toString()});
         OutputStream os = new FileOutputStream(this.getPatchFilePath(), true);
         diffClient.doDiff( changeFile,
         				   SVNRevision.UNDEFINED, 
         				   SVNRevision.WORKING, 
         				   SVNRevision.HEAD,
         				   SVNDepth.INFINITY, 
-        				   false, 
+        				   true, 
         				   os, 
         				   null);
         os.close();
