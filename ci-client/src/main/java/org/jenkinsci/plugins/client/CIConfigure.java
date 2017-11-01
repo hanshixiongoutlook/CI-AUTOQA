@@ -26,7 +26,7 @@ public class CIConfigure {
 	public static final String DATA_PATH = System.getenv("HOME")+File.separator + "AppData/Local/ci-data" + File.separator;
 	
 	/** Jenkins 地址：http://10.95.121.180:8084/jenkins/ */
-	private static final String JENKINS_URL = "http://10.95.121.180:8084/jenkins/";
+	private static final String JENKINS_URL = "http://10.95.121.181:8081/jenkins/";
 	/** 配置文件路径 */
 	public static final String CONFIG_PATH = DATA_PATH + "config.xml";
 	

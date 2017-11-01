@@ -26,10 +26,9 @@ public class HttpClientUtils {
 		HttpClient client = new HttpClient();
 		client.getHttpConnectionManager().getParams().setConnectionTimeout(3000); // 请求超时
 		client.getHttpConnectionManager().getParams().setSoTimeout(3000); // 读取超时
-		GetMethod httpGet = new GetMethod(url);
-		PostMethod httpPost = new PostMethod();
-		client.executeMethod(httpGet);
-		byte[] result = httpGet.getResponseBody();
+		PostMethod httpPost = new PostMethod(url);
+		client.executeMethod(httpPost);
+		byte[] result = httpPost.getResponseBody();
 		returnStr = new String(result, "UTF-8");
 		return returnStr;
 	}
